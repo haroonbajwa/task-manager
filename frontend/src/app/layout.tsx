@@ -1,3 +1,4 @@
+import { Toaster } from "@/components/ui/sonner";
 import type { Metadata } from "next";
 import "./globals.css";
 
@@ -17,7 +18,10 @@ export default function RootLayout({
         <nav className="p-4 bg-blue-600 text-white">
           <h1 className="text-xl font-bold">Task Manager</h1>
         </nav>
-        <main className="container mx-auto p-4">{children}</main>
+        <main className="container mx-auto p-4">
+          {children}
+          <Toaster position="top-right" /> {/* Enables global notifications */}
+        </main>
       </body>
     </html>
   );

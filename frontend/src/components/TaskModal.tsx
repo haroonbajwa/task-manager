@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 
 export default function TaskModal({
   onTaskAdded,
@@ -27,6 +28,12 @@ export default function TaskModal({
 
   const [open, setOpen] = useState(false); // Controls modal visibility
 
+  const statuses = [
+    { value: "pending", label: "Pending" },
+    { value: "in-progress", label: "In Progress" },
+    { value: "completed", label: "Completed" },
+  ];
+
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -37,10 +44,17 @@ export default function TaskModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await createTask(task);
-    setTask({ title: "", description: "", status: "pending" }); // Reset form
-    setOpen(false); // Close modal after submitting
-    onTaskAdded(); // Refresh task list
+    try {
+      await createTask(task);
+      setTask({ title: "", description: "", status: "pending" });
+      setOpen(false);
+      onTaskAdded(); // Refresh task list
+
+      toast.success("Task created successfully!");
+    } catch (error) {
+      console.error("Failed to create task:", error);
+      toast.error("Failed to create task. Please try again.");
+    }
   };
 
   return (
@@ -73,9 +87,11 @@ export default function TaskModal({
             onChange={handleChange}
             className="w-full p-2 border rounded"
           >
-            <option value="pending">Pending</option>
-            <option value="in-progress">In Progress</option>
-            <option value="completed">Completed</option>
+            {statuses.map((status) => (
+              <option key={status.value} value={status.value}>
+                {status.label}
+              </option>
+            ))}
           </select>
           <Button type="submit" className="w-full bg-blue-600 text-white">
             Save Task
