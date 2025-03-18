@@ -1,7 +1,8 @@
 "use client";
 
 import { Task } from "@/types/task";
-import { Pencil, Trash } from "lucide-react";
+import { Pencil } from "lucide-react";
+import DeleteConfirmation from "./DeleteConfirmation";
 
 interface TaskItemProps {
   task: Task;
@@ -37,12 +38,7 @@ export default function TaskItem({ task, onEdit, onDelete }: TaskItemProps) {
         >
           <Pencil size={18} />
         </button>
-        <button
-          onClick={() => onDelete(task.id)}
-          className="text-gray-600 hover:text-red-500 cursor-pointer"
-        >
-          <Trash size={18} />
-        </button>
+        <DeleteConfirmation onConfirm={() => onDelete(task.id)} />
       </div>
 
       {/* Task Title & Description */}
