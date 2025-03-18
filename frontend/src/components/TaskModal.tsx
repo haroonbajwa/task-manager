@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { createTask } from "@/lib/api";
+import { useState, useEffect } from "react";
+import { createTask, updateTask } from "@/lib/api";
 import { Task } from "@/types/task";
 import {
   Dialog,
@@ -16,9 +16,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 
 export default function TaskModal({
-  onTaskAdded,
+  onTaskUpdated,
+  taskToEdit,
 }: {
-  onTaskAdded: () => void;
+  onTaskUpdated: () => void;
+  taskToEdit?: Task;
 }) {
   const [task, setTask] = useState<Omit<Task, "id">>({
     title: "",
@@ -28,11 +30,24 @@ export default function TaskModal({
 
   const [open, setOpen] = useState(false); // Controls modal visibility
 
+  // Statuses array
   const statuses = [
     { value: "pending", label: "Pending" },
     { value: "in-progress", label: "In Progress" },
     { value: "completed", label: "Completed" },
   ];
+
+  // Load task data when editing
+  useEffect(() => {
+    if (taskToEdit) {
+      setTask({
+        title: taskToEdit.title,
+        description: taskToEdit.description,
+        status: taskToEdit.status,
+      });
+      setOpen(true);
+    }
+  }, [taskToEdit]);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -45,26 +60,35 @@ export default function TaskModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await createTask(task);
+      if (taskToEdit) {
+        // Editing an existing task
+        await updateTask(taskToEdit.id, task);
+        toast.success("Task updated successfully!");
+      } else {
+        // Creating a new task
+        await createTask(task);
+        toast.success("Task created successfully!");
+      }
+
       setTask({ title: "", description: "", status: "pending" });
       setOpen(false);
-      onTaskAdded(); // Refresh task list
-
-      toast.success("Task created successfully!");
+      onTaskUpdated(); // Refresh task list
     } catch (error) {
-      console.error("Failed to create task:", error);
-      toast.error("Failed to create task. Please try again.");
+      console.error("Failed to save task:", error);
+      toast.error("Failed to save task. Please try again.");
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-blue-600 text-white">Add Task</Button>
+        {!taskToEdit && (
+          <Button className="bg-blue-600 text-white">Add Task</Button>
+        )}
       </DialogTrigger>
       <DialogContent className="p-6">
         <DialogHeader>
-          <DialogTitle>Create Task</DialogTitle>
+          <DialogTitle>{taskToEdit ? "Edit Task" : "Create Task"}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
@@ -94,7 +118,7 @@ export default function TaskModal({
             ))}
           </select>
           <Button type="submit" className="w-full bg-blue-600 text-white">
-            Save Task
+            {taskToEdit ? "Update Task" : "Save Task"}
           </Button>
         </form>
       </DialogContent>

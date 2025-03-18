@@ -13,6 +13,14 @@ export const createTask = async (task: Omit<Task, "id">): Promise<Task> => {
   return response.data;
 };
 
+export const updateTask = async (
+  id: number,
+  task: Omit<Task, "id">
+): Promise<Task> => {
+  const response = await axios.put(`${API_URL}/${id}`, task);
+  return response.data;
+};
+
 export const deleteTask = async (id: number): Promise<void> => {
   await axios.delete(`${API_URL}/${id}`);
 };
