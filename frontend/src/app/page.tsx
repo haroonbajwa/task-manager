@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { fetchTasks, deleteTask } from "@/lib/api";
 import { Task } from "@/types/task";
 import TaskModal from "@/components/TaskModal";
-import { Pencil, Trash } from "lucide-react";
+import TaskItem from "@/components/TaskItem";
 import { toast } from "sonner";
 
 export default function Home() {
@@ -34,19 +34,8 @@ export default function Home() {
     setTaskToEdit(task);
   };
 
-  // Function to get status chip color
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "pending":
-        return "bg-yellow-100 text-yellow-700";
-      case "in-progress":
-        return "bg-blue-100 text-blue-700";
-      case "completed":
-        return "bg-green-100 text-green-700";
-      default:
-        return "bg-gray-100 text-gray-700";
-    }
-  };
+  const pendingTasks = tasks.filter((task) => task.status !== "completed");
+  const completedTasks = tasks.filter((task) => task.status === "completed");
 
   return (
     <div className="max-w-2xl mx-auto mt-10">
@@ -56,47 +45,37 @@ export default function Home() {
         <TaskModal onTaskUpdated={refreshTasks} taskToEdit={taskToEdit} />
       )}
 
+      {/* Pending & In-Progress Tasks */}
       <ul className="mt-4 space-y-4">
-        {tasks
-          .slice()
-          .reverse()
-          .map((task) => (
-            <li
-              key={task.id}
-              className="relative p-4 border rounded-lg shadow-sm bg-white"
-            >
-              {/* Edit & Delete Icons */}
-              <div className="absolute top-2 right-2 flex gap-2">
-                <button
-                  onClick={() => handleEdit(task)}
-                  className="text-gray-600 hover:text-yellow-500 cursor-pointer"
-                >
-                  <Pencil size={18} />
-                </button>
-                <button
-                  onClick={() => handleDelete(task.id)}
-                  className="text-gray-600 hover:text-red-500 cursor-pointer"
-                >
-                  <Trash size={18} />
-                </button>
-              </div>
+        {pendingTasks.map((task) => (
+          <TaskItem
+            key={task.id}
+            task={task}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        ))}
+      </ul>
 
-              {/* Task Title & Description */}
-              <h2 className="text-lg font-semibold">{task.title}</h2>
-              <p className="text-gray-600 text-sm">{task.description}</p>
+      {/* Divider Line for Completed Tasks */}
+      {completedTasks.length > 0 && (
+        <div className="my-6 border-t-2 border-gray-300 pt-4">
+          <h2 className="text-lg font-semibold text-gray-600">
+            Completed Tasks
+          </h2>
+        </div>
+      )}
 
-              {/* Status Chip */}
-              <span
-                className={`inline-block mt-3 px-3 py-1 text-sm font-medium rounded-lg ${getStatusColor(
-                  task.status
-                )}`}
-              >
-                {task.status === "in-progress"
-                  ? "In Progress"
-                  : task.status.charAt(0).toUpperCase() + task.status.slice(1)}
-              </span>
-            </li>
-          ))}
+      {/* Completed Tasks */}
+      <ul className="mt-4 space-y-4">
+        {completedTasks.map((task) => (
+          <TaskItem
+            key={task.id}
+            task={task}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        ))}
       </ul>
     </div>
   );
