@@ -1,6 +1,7 @@
 # Task Management App
 
 A full-stack **Task Management App** built with **Next.js (React), Node.js, Express.js, and PostgreSQL**.
+![Task Manager Screenshot](./frontend/public/images/screenshot.png)
 
 ## Setup Instructions
 
