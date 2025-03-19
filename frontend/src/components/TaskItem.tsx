@@ -1,16 +1,24 @@
 "use client";
 
 import { Task } from "@/types/task";
-import { Pencil } from "lucide-react";
+import { CheckCircle, Pencil } from "lucide-react";
 import DeleteConfirmation from "./DeleteConfirmation";
+import { updateTask } from "@/lib/api";
+import { toast } from "sonner";
 
 interface TaskItemProps {
   task: Task;
   onEdit: (task: Task) => void;
   onDelete: (id: number) => void;
+  onUpdate: () => void;
 }
 
-export default function TaskItem({ task, onEdit, onDelete }: TaskItemProps) {
+export default function TaskItem({
+  task,
+  onEdit,
+  onDelete,
+  onUpdate,
+}: TaskItemProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "pending":
@@ -21,6 +29,22 @@ export default function TaskItem({ task, onEdit, onDelete }: TaskItemProps) {
         return "bg-green-100 text-green-700";
       default:
         return "bg-gray-100 text-gray-700";
+    }
+  };
+
+  const handleComplete = async () => {
+    if (task.status === "completed") return;
+
+    try {
+      await updateTask(task.id, {
+        title: task.title,
+        description: task.description,
+        status: "completed",
+      });
+      toast.success("Task marked as completed!");
+      onUpdate();
+    } catch {
+      toast.error("Failed to update task.");
     }
   };
 
@@ -55,6 +79,16 @@ export default function TaskItem({ task, onEdit, onDelete }: TaskItemProps) {
           ? "In Progress"
           : task.status.charAt(0).toUpperCase() + task.status.slice(1)}
       </span>
+
+      {/* mark as completed button*/}
+      {task.status !== "completed" && (
+        <button
+          onClick={handleComplete}
+          className="absolute bottom-2 right-2 text-gray-600 hover:text-green-500 cursor-pointer"
+        >
+          <CheckCircle size={24} />
+        </button>
+      )}
     </li>
   );
 }

@@ -11,32 +11,21 @@ export default function Home() {
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  useEffect(() => {
-    const loadTasks = async () => {
-      try {
-        const data = await fetchTasks();
-        setTasks(data);
-      } catch (error) {
-        console.error("Error fetching tasks:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadTasks();
-  }, []);
-
-  const refreshTasks = async () => {
+  const loadTasks = async () => {
     setLoading(true);
     try {
       const data = await fetchTasks();
       setTasks(data);
     } catch (error) {
-      console.error("Error refreshing tasks:", error);
+      console.error("Error fetching tasks:", error);
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadTasks();
+  }, []);
 
   const handleDelete = async (id: number) => {
     await deleteTask(id);
@@ -47,15 +36,19 @@ export default function Home() {
     setTaskToEdit(task);
   };
 
-  const pendingTasks = tasks.filter((task) => task.status !== "completed");
-  const completedTasks = tasks.filter((task) => task.status === "completed");
+  const pendingTasks = tasks
+    .filter((task) => task.status !== "completed")
+    .reverse();
+  const completedTasks = tasks
+    .filter((task) => task.status === "completed")
+    .reverse();
 
   return (
     <div className="max-w-2xl mx-auto mt-10">
       <h1 className="text-2xl font-bold mb-4">Task Manager</h1>
-      <TaskModal onTaskUpdated={refreshTasks} />
+      <TaskModal onTaskUpdated={loadTasks} />
       {taskToEdit && (
-        <TaskModal onTaskUpdated={refreshTasks} taskToEdit={taskToEdit} />
+        <TaskModal onTaskUpdated={loadTasks} taskToEdit={taskToEdit} />
       )}
 
       {/* Show Loader While Tasks are Loading */}
@@ -74,6 +67,7 @@ export default function Home() {
                 task={task}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                onUpdate={loadTasks}
               />
             ))}
           </ul>
@@ -95,6 +89,7 @@ export default function Home() {
                 task={task}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                onUpdate={loadTasks}
               />
             ))}
           </ul>
