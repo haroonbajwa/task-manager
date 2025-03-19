@@ -13,7 +13,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "sonner";
 
 export default function TaskModal({
   onTaskUpdated,
@@ -59,24 +58,15 @@ export default function TaskModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      if (taskToEdit) {
-        // Editing an existing task
-        await updateTask(taskToEdit.id, task);
-        toast.success("Task updated successfully!");
-      } else {
-        // Creating a new task
-        await createTask(task);
-        toast.success("Task created successfully!");
-      }
-
-      setTask({ title: "", description: "", status: "pending" });
-      setOpen(false);
-      onTaskUpdated(); // Refresh task list
-    } catch (error) {
-      console.error("Failed to save task:", error);
-      toast.error("Failed to save task. Please try again.");
+    if (taskToEdit) {
+      await updateTask(taskToEdit.id, task);
+    } else {
+      await createTask(task);
     }
+
+    setTask({ title: "", description: "", status: "pending" });
+    setOpen(false);
+    onTaskUpdated(); // Refresh task list
   };
 
   return (

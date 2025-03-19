@@ -5,7 +5,6 @@ import { fetchTasks, deleteTask } from "@/lib/api";
 import { Task } from "@/types/task";
 import TaskModal from "@/components/TaskModal";
 import TaskItem from "@/components/TaskItem";
-import { toast } from "sonner";
 
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -40,14 +39,8 @@ export default function Home() {
   };
 
   const handleDelete = async (id: number) => {
-    try {
-      await deleteTask(id);
-      setTasks((prev) => prev.filter((task) => task.id !== id));
-      toast.success("Task deleted successfully!");
-    } catch (error) {
-      console.error("Failed to delete task:", error);
-      toast.error("Error deleting task. Please try again.");
-    }
+    await deleteTask(id);
+    setTasks((prev) => prev.filter((task) => task.id !== id));
   };
 
   const handleEdit = (task: Task) => {
