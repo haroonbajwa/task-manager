@@ -1,6 +1,7 @@
-import { Toaster } from "@/components/ui/sonner";
 import type { Metadata } from "next";
 import "./globals.css";
+import AuthLayout from "@/components/AuthLayout";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Task Manager",
@@ -9,19 +10,14 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
       <body className="bg-gray-100 text-gray-900">
-        <nav className="p-4 bg-blue-600 text-white">
-          <h1 className="text-xl font-bold">Task Manager</h1>
-        </nav>
-        <main className="container mx-auto p-4">
-          {children}
-          <Toaster position="top-right" /> {/* Enables global notifications */}
-        </main>
+        <AuthLayout>{children}</AuthLayout>
+        <Toaster position="top-right" /> {/* Enables global notifications */}
       </body>
     </html>
   );

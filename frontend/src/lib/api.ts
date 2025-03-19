@@ -1,7 +1,17 @@
 import axios from "axios";
 import { Task } from "@/types/task";
+import { getToken } from "@/utils/auth";
 
 const API_URL = "http://localhost:5000/tasks";
+
+// Attach token before every request
+axios.interceptors.request.use((config) => {
+  const token = getToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 export const fetchTasks = async (): Promise<Task[]> => {
   const response = await axios.get(API_URL);

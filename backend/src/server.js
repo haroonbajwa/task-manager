@@ -3,6 +3,7 @@ const cors = require("cors");
 require("dotenv").config();
 const sequelize = require("./config/database");
 const taskRoutes = require("./routes/task.routes");
+const authRoutes = require("./routes/auth.routes");
 
 const app = express();
 
@@ -12,6 +13,7 @@ app.use(express.json());
 
 // Routes
 app.use("/tasks", taskRoutes);
+app.use("/auth", authRoutes);
 
 // Sync database and start server
 sequelize
